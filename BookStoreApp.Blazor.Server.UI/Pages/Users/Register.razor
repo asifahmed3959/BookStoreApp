@@ -48,21 +48,34 @@
 
 
 @code {
-    UserDto RegistrationModel = new UserDto();
+    UserDto RegistrationModel = new UserDto
+        {
+            Role = "User"
+        };
+
     string message = string.Empty;
     private async Task HandleRegistration()
     {
-        RegistrationModel.Role = "User";
 
         try
         {
             await httpClient.RegisterAsync(RegistrationModel);
-            _navManager.NavigateTo("/users/login");
+            NavigateLogin();
         }
         catch (ApiException ex)
         {
-            message = ex.Message;
+
+            if (ex.StatusCode <= 299 && ex.StatusCode >= 200)
+            {
+                NavigateLogin();
+            }
+            message = ex.Response;
         }
 
+    }
+
+    private void NavigateLogin()
+    {
+        _navManager.NavigateTo("/users/login");
     }
 }
