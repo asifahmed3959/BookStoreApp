@@ -1,31 +1,28 @@
 ﻿using AutoMapper;
 using Blazored.LocalStorage;
 using BookStoreApp.Blazor.Server.UI.Services.Base;
-    
-  
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace BookStoreApp.Blazor.Server.UI.Services
 {
-    public class AuthorService : BaseHttpService, IAuthorService
+    public class BookService : BaseHttpService, IBookService
     {
 
         private readonly IClient client;
         private readonly IMapper mapper;
 
-        public AuthorService(IClient client, ILocalStorageService localStorage, IMapper mapper) : base(client, localStorage)
+        public BookService(IClient client, ILocalStorageService localStorage, IMapper mapper) : base(client, localStorage)
         {
             this.client = client;
             this.mapper = mapper;
         }
-        public async Task<Response<int>> Create(AuthorCreateDto author)
+        public async Task<Response<int>> Create(BookCreateDto bookCreateDto)
         {
             Response<int> response = new();
 
-            try 
+            try
             {
                 await GetBearerToken();
-                await client.AuthorsPOSTAsync(author);
+                await client.BooksPOSTAsync(bookCreateDto);
             }
             catch (ApiException ex)
             {
@@ -38,13 +35,12 @@ namespace BookStoreApp.Blazor.Server.UI.Services
         public async Task<Response<int>> Delete(int id)
         {
             Response<int> response = new();
-            
-            try 
+            try
             {
                 await GetBearerToken();
-                await client.AuthorsDELETEAsync(id);
+                await client.BooksDELETEAsync(id);
             }
-            catch(ApiException ex) 
+            catch (ApiException ex)
             {
                 response = ConvertApiException<int>(ex);
             }
@@ -52,56 +48,54 @@ namespace BookStoreApp.Blazor.Server.UI.Services
             return response;
         }
 
-        public async Task<Response<int>> Edit(int id, AuthorUpdateDto author)
+        public async Task<Response<int>> Edit(int id, BookUpdateDto Book)
         {
             Response<int> response = new();
-
-            try 
-            {
-                await GetBearerToken();
-                await client.AuthorsPUTAsync(id, author);
-            }
-            catch (ApiException ex) 
-            {
-                response = ConvertApiException<int>(ex);
-            }
-            return response;
-        }
-
-        
-
-        public async Task<Response<AuthorUpdateDto>> GetForUpdate(int id)
-        {
-            Response<AuthorUpdateDto> response;
 
             try
             {
                 await GetBearerToken();
-                var data = await client.AuthorsGETAsync(id);
-                response = new Response<AuthorUpdateDto>
+                await client.BooksPUTAsync(id, Book);
+            }
+            catch (ApiException ex)
+            {
+                response = ConvertApiException<int>(ex);
+            }
+            return response;
+        }
+
+        public async Task<Response<BookUpdateDto>> GetForUpdate(int id)
+        {
+            Response<BookUpdateDto> response;
+
+            try
+            {
+                await GetBearerToken();
+                var data = await client.BooksGETAsync(id);
+                response = new Response<BookUpdateDto>
                 {
-                    Data = mapper.Map<AuthorUpdateDto>(data),
+                    Data = mapper.Map<BookUpdateDto>(data),
                     Success = true
                 };
 
             }
             catch (ApiException exception)
             {
-                response = ConvertApiException<AuthorUpdateDto>(exception);
+                response = ConvertApiException<BookUpdateDto>(exception);
             }
 
-            return response; 
+            return response;
         }
 
-        public async Task<Response<List<AuthorReadOnlyDto>>> Get()
+        public async Task<Response<List<BookReadOnlyDto>>> Get()
         {
-            Response<List<AuthorReadOnlyDto>> response;
+            Response<List<BookReadOnlyDto>> response;
 
             try
             {
                 await GetBearerToken();
-                var data = await client.AuthorsAllAsync();
-                response = new Response<List<AuthorReadOnlyDto>>
+                var data = await client.BooksAllAsync();
+                response = new Response<List<BookReadOnlyDto>>
                 {
                     Data = data.ToList(),
                     Success = true
@@ -109,28 +103,28 @@ namespace BookStoreApp.Blazor.Server.UI.Services
             }
             catch (ApiException exception)
             {
-                response = ConvertApiException<List<AuthorReadOnlyDto>>(exception);
+                response = ConvertApiException<List<BookReadOnlyDto>>(exception);
             }
             return response;
         }
 
-        public async Task<Response<AuthorDetailsDto>> Get(int id)
+        public async Task<Response<BookDetailsDto>> Get(int id)
         {
-            Response<AuthorDetailsDto> response;
+            Response<BookDetailsDto> response;
 
             try
             {
                 await GetBearerToken();
-                var data = await client.AuthorsGETAsync(id);
-                response = new Response<AuthorDetailsDto>
+                var data = await client.BooksGETAsync(id);
+                response = new Response<BookDetailsDto>
                 {
-                    Data = mapper.Map<AuthorDetailsDto>(data),
+                    Data = mapper.Map<BookDetailsDto>(data),
                     Success = true
                 };
             }
             catch (ApiException exception)
             {
-                response = ConvertApiException<AuthorDetailsDto>(exception);
+                response = ConvertApiException<BookDetailsDto>(exception);
             }
 
             return response;
